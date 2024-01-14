@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+    # api holds all of our backend code
+    api:
+        image: gatech/backend
+ 
+        ports:
+            - "8080:8080"
+        environment:
+            # NOTE: db refers to the db service defined below. Docker will automatically resolve this to the container
+            - DB_HOST=db
+            - SPRING_DATASOURCE_USERNAME=root
+            - SPRING_DATASOURCE_PASSWORD=password
+            - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/GroceryExpress?createDatabaseIfNotExist=true
+        depends_on:
+            - db
+        # sleep for 5 seconds to give the db time to boot up
+        command: >
+            sh -c "sleep 5 &&
+               java -jar /groceryexpress/GroceryExpress-0.0.1-SNAPSHOT.jar"
+
+    # db is a mysql instance
+    db:
+        image: mysql:8.0.31
+        # networks:
+        #     - internal
+        environment:
+            - MYSQL_ROOT_PASSWORD=password
+        ports:
+            - "3306:3306"
